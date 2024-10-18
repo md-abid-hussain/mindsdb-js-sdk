@@ -5,9 +5,13 @@ import Constants from '../constants';
 import Project from './project';
 import HttpAuthenticator from '../httpAuthenticator';
 import { MindsDbError } from '../errors';
+import SqlApiClient from '../sql/sqlApiClient';
+import mysql from 'mysql';
 
 /** Implementation of ProjectsApiClient that goes through the REST API. */
 export default class ProjectsRestApiClient extends ProjectsApiClient {
+  sqlApiClient:SqlApiClient;
+
   /** Axios client to send all HTTP requests. */
   client: Axios;
 
@@ -18,9 +22,10 @@ export default class ProjectsRestApiClient extends ProjectsApiClient {
    * Constructor for Projects API client.
    * @param {Axios} client - Axios instance to send all HTTP requests.
    */
-  constructor(client: Axios, authenticator: HttpAuthenticator) {
+  constructor(sqlApiClient:SqlApiClient, client: Axios, authenticator: HttpAuthenticator) {
     super();
     this.client = client;
+    this.sqlApiClient = sqlApiClient;
     this.authenticator = authenticator;
   }
 
@@ -51,5 +56,19 @@ export default class ProjectsRestApiClient extends ProjectsApiClient {
     } catch (error) {
       throw MindsDbError.fromHttpError(error, projectsUrl);
     }
+  }
+
+  /**
+   * Creates a new MindsDB project.
+   * @param {string} name 
+   * @returns {Promise<Project>} - Newly created project.
+   */
+  override async createProject(name: string): Promise<Project> {
+    const sqlQuery = `CREATE PROJECT ${mysql.escapeId(name)}`;
+    const sqlQueryResult = await this.sqlApiClient.runQuery(sqlQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
+    return new Project(name);
   }
 }

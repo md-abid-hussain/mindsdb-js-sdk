@@ -7,4 +7,5 @@ export default abstract class ProjectsApiClient {
    * @returns {Promise<Array<Project>>} - All projects.
    */
   abstract getAllProjects(): Promise<Array<Project>>;
+  abstract createProject(name: string): Promise<Project>;
 }
