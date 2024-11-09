@@ -14,6 +14,7 @@ import {
 import TablesModule from './tables/tablesModule';
 import skillsModule from './skills/skillsModule';
 import knowledgeBaseModule from './knowledge_bases/knowledge_baseModule';
+import AgentsModule from './agents/agentsModule';
 import HttpAuthenticator from './httpAuthenticator';
 import { Axios } from 'axios';
 
@@ -65,6 +66,7 @@ const KnowledgeBases = new knowledgeBaseModule.KnowledgeBaseRestApiClient(
   SQL,
   defaultAxiosInstance
 );
+const Agents = new AgentsModule.AgentsRestApiClient(defaultAxiosInstance);
 const Callbacks = new CallbacksModule.CallbacksRestApiClient(
   defaultAxiosInstance,
   httpAuthenticator
@@ -131,6 +133,7 @@ export default {
   Callbacks,
   Skills,
   KnowledgeBases,
+  Agents,
 };
 export {
   ConnectionOptions,
